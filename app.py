@@ -1,4 +1,5 @@
-﻿import streamlit as st
+import time
+import streamlit as st
 import numpy as np
 import pandas as pd
 from PIL import Image
@@ -9,7 +10,7 @@ from tensorflow.keras.models import load_model
 # =========================================================
 st.set_page_config(
     page_title="AI Steganography Detection",
-    page_icon="🕵️‍♀️",
+    page_icon="🕵️‍",
     layout="wide",
 )
 
@@ -162,7 +163,6 @@ st.markdown(
 # =========================================================
 # Model configuration (two models)
 # =========================================================
-# Update these paths to match your actual filenames in the models/ folder
 MODEL_CONFIG = {
     "Basic CNN (Keras)": "models/basic_cnn_model.keras",
     "ResNet50 (Keras)": "models/resnet50_model.keras",
@@ -172,6 +172,8 @@ MODEL_INPUT_SIZE = {
     "Basic CNN (Keras)": (256, 256),
     "ResNet50 (Keras)": (512, 512),
 }
+
+ALLOWED_IMAGE_EXTENSIONS = (".jpg", ".jpeg", ".png")
 
 # =========================================================
 # Helper functions
@@ -238,6 +240,21 @@ def render_confusion_matrix(cm):
     st.pyplot(fig)
 
 
+def validate_uploaded_images(files):
+    """Validate that all uploaded files have supported image extensions."""
+    if not files:
+        return False, ["No files uploaded."]
+
+    invalid = [
+        f.name for f in files
+        if not f.name.lower().endswith(ALLOWED_IMAGE_EXTENSIONS)
+    ]
+
+    if invalid:
+        return False, invalid
+    return True, []
+
+
 # =========================================================
 # Sidebar Layout
 # =========================================================
@@ -285,7 +302,6 @@ reset_action = st.sidebar.button("Reset session", type="secondary")
 if reset_action:
     for k in list(st.session_state.keys()):
         del st.session_state[k]
-    # ✅ Updated: use st.rerun() instead of deprecated st.experimental_rerun()
     st.rerun()
 
 # =========================================================
@@ -357,7 +373,6 @@ if uploaded_files:
             if idx < len(uploaded_files):
                 file = uploaded_files[idx]
                 image = Image.open(file)
-                # ✅ Updated: use use_container_width instead of deprecated use_column_width
                 col.image(
                     image,
                     caption=file.name,
@@ -372,63 +387,101 @@ run_detection = st.button("Run detection")
 
 if "results" not in st.session_state:
     st.session_state["results"] = []
+if "perf_summary" not in st.session_state:
+    st.session_state["perf_summary"] = None
 
-if run_detection and uploaded_files:
-    results = []
+if run_detection:
+    # Validate files first
+    valid, invalid_files = validate_uploaded_images(uploaded_files)
 
-    # First: load the selected model (lazy-load)
-    with st.spinner(f"Loading {model_choice} model..."):
-        model = load_stego_model(model_choice)
+    if not uploaded_files:
+        st.error(
+            "No images were uploaded. Please upload at least one JPG/PNG file "
+            "before running detection."
+        )
+    elif not valid:
+        st.error(
+            "The following files are not supported image types "
+            "(expected JPG/PNG):\n\n- " + "\n- ".join(invalid_files)
+        )
+    else:
+        results = []
 
-    # Then: run predictions with a progress bar
-    total = len(uploaded_files)
-    progress_text = "Running model predictions..."
-    progress_bar = st.progress(0, text=progress_text)
+        # Measure model load time
+        load_start = time.perf_counter()
+        with st.spinner(f"Loading {model_choice} model..."):
+            model = load_stego_model(model_choice)
+        load_end = time.perf_counter()
+        model_load_ms = (load_end - load_start) * 1000.0
 
-    for i, file in enumerate(uploaded_files, start=1):
-        image = Image.open(file)
-        input_arr = preprocess_image(image, model_choice)
-        score = float(model.predict(input_arr)[0][0])
+        # Then: run predictions with a progress bar and timing
+        total = len(uploaded_files)
+        progress_text = "Running model predictions..."
+        progress_bar = st.progress(0, text=progress_text)
 
-        predicted_label = "Stego" if score > threshold else "Clean"
+        batch_start = time.perf_counter()
 
-        # Normalize expected label if available
-        raw_label = label_dict.get(file.name)
-        if raw_label is None:
-            expected_label = "N/A"
-        else:
-            # Accept 0/1 or strings like "Clean"/"Stego"
-            if isinstance(raw_label, str):
-                lbl = raw_label.strip().lower()
-                if lbl in ["1", "stego", "steganography"]:
-                    expected_label = "Stego"
-                elif lbl in ["0", "clean", "cover"]:
-                    expected_label = "Clean"
-                else:
-                    expected_label = "N/A"
+        for i, file in enumerate(uploaded_files, start=1):
+            image = Image.open(file)
+
+            img_start = time.perf_counter()
+            input_arr = preprocess_image(image, model_choice)
+            score = float(model.predict(input_arr)[0][0])
+            img_end = time.perf_counter()
+
+            prediction_time_ms = (img_end - img_start) * 1000.0
+
+            predicted_label = "Stego" if score > threshold else "Clean"
+
+            # Normalize expected label if available
+            raw_label = label_dict.get(file.name)
+            if raw_label is None:
+                expected_label = "N/A"
             else:
-                # Assume numeric
-                expected_label = "Stego" if raw_label == 1 else "Clean"
+                # Accept 0/1 or strings like "Clean"/"Stego"
+                if isinstance(raw_label, str):
+                    lbl = raw_label.strip().lower()
+                    if lbl in ["1", "stego", "steganography"]:
+                        expected_label = "Stego"
+                    elif lbl in ["0", "clean", "cover"]:
+                        expected_label = "Clean"
+                    else:
+                        expected_label = "N/A"
+                else:
+                    # Assume numeric
+                    expected_label = "Stego" if raw_label == 1 else "Clean"
 
-        results.append(
-            {
-                "filename": file.name,
-                "predicted_label": predicted_label,
-                "model_score": f"{score:.4f}",
-                "expected_label": expected_label,
-            }
-        )
+            results.append(
+                {
+                    "filename": file.name,
+                    "predicted_label": predicted_label,
+                    "model_score": f"{score:.4f}",
+                    "expected_label": expected_label,
+                    "prediction_time_ms": f"{prediction_time_ms:.2f}",
+                }
+            )
 
-        # Update progress bar
-        progress_bar.progress(
-            i / total,
-            text=f"Analyzing image {i} of {total}...",
-        )
+            # Update progress bar
+            progress_bar.progress(
+                i / total,
+                text=f"Analyzing image {i} of {total}...",
+            )
 
-    # Clear the progress bar when done
-    progress_bar.empty()
+        batch_end = time.perf_counter()
+        progress_bar.empty()
 
-    st.session_state["results"] = results
+        total_pred_ms = (batch_end - batch_start) * 1000.0
+        avg_pred_ms = total_pred_ms / total if total > 0 else 0.0
+
+        st.session_state["results"] = results
+        st.session_state["perf_summary"] = {
+            "model": model_choice,
+            "num_images": total,
+            "threshold": float(threshold),
+            "model_load_ms": model_load_ms,
+            "total_pred_ms": total_pred_ms,
+            "avg_pred_ms": avg_pred_ms,
+        }
 
 # =========================================================
 # Results Display
@@ -453,14 +506,56 @@ if results:
     # Download results
     csv_data = results_df.to_csv(index=False).encode("utf-8")
     st.download_button(
-        label="Download results as CSV",
+        label="Download results (CSV)",
         data=csv_data,
         file_name="steg_detection_results.csv",
         mime="text/csv",
     )
 
     # =====================================================
-    # Metrics Section
+    # Performance Summary
+    # =====================================================
+    perf_summary = st.session_state.get("perf_summary")
+    if perf_summary:
+        st.subheader("Performance summary")
+
+        col_p1, col_p2, col_p3 = st.columns(3)
+        col_p1.metric(
+            "Model load time (ms)",
+            f"{perf_summary['model_load_ms']:.1f}",
+        )
+        col_p2.metric(
+            "Total prediction time (ms)",
+            f"{perf_summary['total_pred_ms']:.1f}",
+        )
+        col_p3.metric(
+            "Avg prediction per image (ms)",
+            f"{perf_summary['avg_pred_ms']:.1f}",
+        )
+
+        perf_df = pd.DataFrame(
+            [
+                {
+                    "model": perf_summary["model"],
+                    "num_images": perf_summary["num_images"],
+                    "threshold": perf_summary["threshold"],
+                    "model_load_ms": round(perf_summary["model_load_ms"], 2),
+                    "total_pred_ms": round(perf_summary["total_pred_ms"], 2),
+                    "avg_pred_ms": round(perf_summary["avg_pred_ms"], 2),
+                }
+            ]
+        )
+        perf_csv = perf_df.to_csv(index=False).encode("utf-8")
+
+        st.download_button(
+            label="Download performance summary (CSV)",
+            data=perf_csv,
+            file_name="performance_summary.csv",
+            mime="text/csv",
+        )
+
+    # =====================================================
+    # Metrics Section (Accuracy / Precision / Recall / F1)
     # =====================================================
     st.subheader("Batch metrics (optional)")
 
@@ -473,7 +568,7 @@ if results:
         col_m3.metric("Recall", f"{rec:.2f}")
         col_m4.metric("F1-score", f"{f1:.2f}")
 
-        st.markdown("#### Confusion matrix")
+        st.markdown("#### Confusion Matrix")
         render_confusion_matrix(cm)
     else:
         st.info(
