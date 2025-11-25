@@ -41,7 +41,9 @@ ai-stego-app/
 ├── requirements.txt
 
 ├── models/
+
 │   ├── basic_cnn_model.keras
+
 │   └── resnet50_model.keras
 
 ├── sample-images/               # Optional sample images
