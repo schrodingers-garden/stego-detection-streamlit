@@ -447,13 +447,8 @@ if run_detection:
         load_end = time.perf_counter()
         model_load_ms = (load_end - load_start) * 1000.0
 
-        # Model status message (covers T3/T4)
-        if model_loaded and model is not None:
-            st.success(
-                f"Model status: **Found** – using **{model_choice}** for inference."
-            )
-            engine_mode = "model"
-        else:
+        # Model status - displays error message if not found
+        if not model_loaded or model is None:
             st.error(
                 "Model status: **Not found (using heuristic fallback)**.\n\n"
                 "The trained Keras model for this selection could not be loaded. "
@@ -650,6 +645,7 @@ else:
     st.caption(
         "Upload at least one image and click **Run detection** to see predictions."
     )
+
 
 
 
