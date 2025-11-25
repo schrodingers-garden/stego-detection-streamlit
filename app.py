@@ -478,23 +478,22 @@ if run_detection:
 
             # --- Choose engine: model vs heuristic ---
             if model_loaded and model is not None:
-            	# Use the selected model name (shortened) for the engine column
-            	if "Basic CNN" in model_choice:
-                	engine_label = "CNN"
-            	elif "ResNet50" in model_choice:
-                	engine_label = "ResNet50"
-            	else:
-                	# Fallback: just use whatever is in the dropdown
-                	engine_label = model_choice
-					
+                # Use the selected model name (shortened) for the engine column
+                if "Basic CNN" in model_choice:
+                    engine_label = "Basic CNN"
+                elif "ResNet50" in model_choice:
+                    engine_label = "ResNet50"
+                else:
+                    # Fallback: just use whatever is in the dropdown
+                    engine_label = model_choice
+
                 input_arr = preprocess_image(image, model_choice)
-            	score = float(model.predict(input_arr)[0][0])
+                score = float(model.predict(input_arr)[0][0])
             else:
                 # Heuristic fallback (no Keras model available)
                 engine_label = "Heuristic"
-            	score = heuristic_score(image)
-			
-			# --- Track image load time ---
+                score = heuristic_score(image)
+
             img_end = time.perf_counter()
             prediction_time_ms = (img_end - img_start) * 1000.0
 
@@ -525,7 +524,7 @@ if run_detection:
                     "model_score": f"{score:.4f}",
                     "expected_label": expected_label,
                     "prediction_time_ms": f"{prediction_time_ms:.2f}",
-                    "engine": engine_label,  #shows which engine was used
+                    "engine": engine_label,  # shows CNN / ResNet50 / Heuristic
                 }
             )
 
@@ -545,7 +544,7 @@ if run_detection:
         st.session_state["results"] = results
         st.session_state["perf_summary"] = {
             "model": model_choice,
-            "engine_mode": engine_mode,  # NEW: overall mode (model vs heuristic)
+            "engine_mode": engine_mode,  # overall mode (model vs heuristic)
             "num_images": total,
             "threshold": float(threshold),
             "model_load_ms": model_load_ms,
@@ -651,5 +650,6 @@ else:
     st.caption(
         "Upload at least one image and click **Run detection** to see predictions."
     )
+
 
 
