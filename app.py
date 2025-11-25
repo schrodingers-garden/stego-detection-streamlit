@@ -478,22 +478,23 @@ if run_detection:
 
             # --- Choose engine: model vs heuristic ---
             if model_loaded and model is not None:
-            # Use the selected model name (shortened) for the engine column
-            if "Basic CNN" in model_choice:
-                engine_label = "Basic CNN"
-            elif "ResNet50" in model_choice:
-                engine_label = "ResNet50"
-            else:
-                # Fallback: just use whatever is in the dropdown
-                engine_label = model_choice
+            	# Use the selected model name (shortened) for the engine column
+            	if "Basic CNN" in model_choice:
+                	engine_label = "CNN"
+            	elif "ResNet50" in model_choice:
+                	engine_label = "ResNet50"
+            	else:
+                	# Fallback: just use whatever is in the dropdown
+                	engine_label = model_choice
 
-            input_arr = preprocess_image(image, model_choice)
-            score = float(model.predict(input_arr)[0][0])
-        else:
-            # Heuristic fallback (no Keras model available)
-            engine_label = "Heuristic"
-            score = heuristic_score(image)
-
+            	input_arr = preprocess_image(image, model_choice)
+            	score = float(model.predict(input_arr)[0][0])
+        	else:
+            	# Heuristic fallback (no Keras model available)
+            	engine_label = "Heuristic"
+            	score = heuristic_score(image)
+			
+			# --- Track image load time ---
             img_end = time.perf_counter()
             prediction_time_ms = (img_end - img_start) * 1000.0
 
@@ -650,3 +651,4 @@ else:
     st.caption(
         "Upload at least one image and click **Run detection** to see predictions."
     )
+
