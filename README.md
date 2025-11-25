@@ -37,11 +37,15 @@ This tool was developed as part of an academic capstone project in Information S
 ai-stego-app/
 
 ├── app.py                       # Main Streamlit application
+
 ├── requirements.txt
+
 ├── models/
 │   ├── basic_cnn_model.keras
 │   └── resnet50_model.keras
+
 ├── sample-images/               # Optional sample images
+
 └── README.md
 
 ---
