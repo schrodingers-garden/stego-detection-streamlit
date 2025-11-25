@@ -486,12 +486,12 @@ if run_detection:
             	else:
                 	# Fallback: just use whatever is in the dropdown
                 	engine_label = model_choice
-
-            	input_arr = preprocess_image(image, model_choice)
+					
+                input_arr = preprocess_image(image, model_choice)
             	score = float(model.predict(input_arr)[0][0])
-        	else:
-            	# Heuristic fallback (no Keras model available)
-            	engine_label = "Heuristic"
+            else:
+                # Heuristic fallback (no Keras model available)
+                engine_label = "Heuristic"
             	score = heuristic_score(image)
 			
 			# --- Track image load time ---
@@ -651,4 +651,5 @@ else:
     st.caption(
         "Upload at least one image and click **Run detection** to see predictions."
     )
+
 
