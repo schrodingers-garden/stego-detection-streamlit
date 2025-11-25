@@ -19,6 +19,7 @@ This tool was developed as part of an academic capstone project in Information S
   - Filename
   - Predicted label (Clean/Stego)
   - Model score
+  - Model engine
   - Expected label (if provided)
 - Optional evaluation using labeled CSV
 - Export results to CSV
@@ -28,6 +29,7 @@ This tool was developed as part of an academic capstone project in Information S
   - Recall
   - F1-score
   - Confusion matrix visualization
+  - Performance (latency)
 
 ---
 
@@ -81,6 +83,7 @@ streamlit run app.py
 5. Click "Run detection"
 6. Review predictions and metrics
 7. Download results as CSV for reporting or audit
+8. Select "reset session" to clear results.
 
 ---
 
@@ -91,6 +94,8 @@ This application can be deployed for free using Streamlit Community Cloud:
 2. Connect Streamlit Cloud to GitHub
 3. Deploy using:
    app.py as the entry point
+
+Or visit: https://stego-detection-app-aumgajizq2ensgnco4ruuf.streamlit.app/
 
 ---
 
