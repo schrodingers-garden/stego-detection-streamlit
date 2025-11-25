@@ -29,7 +29,7 @@ This tool was developed as part of an academic capstone project in Information S
   - Recall
   - F1-score
   - Confusion matrix visualization
-  - Performance (latency)
+  - Performance tracking
 
 ---
 
