@@ -539,7 +539,7 @@ if run_detection:
         st.session_state["results"] = results
         st.session_state["perf_summary"] = {
             "model": model_choice,
-            "engine_mode": engine_mode,  # overall mode (model vs heuristic)
+            "engine_mode": engine_label,  # overall mode (model vs heuristic)
             "num_images": total,
             "threshold": float(threshold),
             "model_load_ms": model_load_ms,
@@ -645,6 +645,7 @@ else:
     st.caption(
         "Upload at least one image and click **Run detection** to see predictions."
     )
+
 
 
 
