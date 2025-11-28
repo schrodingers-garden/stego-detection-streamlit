@@ -7,4 +7,5 @@ tensorflow
 scikit-learn
 matplotlib
 seaborn
-efficientnet
+efficientnet==1.1.1     # 👈 add this line
+h5py
