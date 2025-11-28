@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from PIL import Image
 from tensorflow.keras.models import load_model
+from tensorflow.keras.applications import EfficientNetB0  # needed for Kaggle EfficientNet model.h5
 
 # =========================================================
 # App Configuration
@@ -167,11 +168,13 @@ st.markdown(
 MODEL_CONFIG = {
     "Basic CNN (Keras)": "models/basic_cnn_model.keras",
     "ResNet50 (Keras)": "models/resnet50_model.keras",
+    "EfficientNet (Kaggle)": "models/efficientnet_pretrained_model.h5",
 }
 
 MODEL_INPUT_SIZE = {
     "Basic CNN (Keras)": (256, 256),
     "ResNet50 (Keras)": (512, 512),
+    "EfficientNet (Kaggle)": (512,512),
 }
 
 ALLOWED_IMAGE_EXTENSIONS = (".jpg", ".jpeg", ".png")
@@ -478,6 +481,8 @@ if run_detection:
                     engine_label = "Basic CNN"
                 elif "ResNet50" in model_choice:
                     engine_label = "ResNet50"
+                elif "EfficientNet" in model_choice:
+                    engine_label = "EfficientNet"
                 else:
                     # Fallback: just use whatever is in the dropdown
                     engine_label = model_choice
@@ -645,8 +650,3 @@ else:
     st.caption(
         "Upload at least one image and click **Run detection** to see predictions."
     )
-
-
-
-
-
