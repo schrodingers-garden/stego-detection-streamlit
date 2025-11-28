@@ -4,7 +4,12 @@ import numpy as np
 import pandas as pd
 from PIL import Image
 from tensorflow.keras.models import load_model
-from tensorflow.keras.applications import EfficientNetB0  # needed for Kaggle EfficientNet model.h5
+
+# For EfficientNet Kaggle model
+try:
+    import efficientnet.tfkeras as efn  # registers custom EfficientNet layers
+except ImportError:
+    efn = None
 
 # =========================================================
 # App Configuration
@@ -192,6 +197,19 @@ def load_stego_model(model_key: str):
     exception and let the caller decide to fall back to a heuristic.
     """
     model_path = MODEL_CONFIG[model_key]
+
+    # Special handling for the Kaggle EfficientNet model
+    if "EfficientNet" in model_key:
+        if efn is None:
+            raise RuntimeError(
+                "efficientnet.tfkeras is not installed. "
+                "Make sure 'efficientnet' is in requirements.txt."
+            )
+
+        # Most Kaggle EfficientNet models can be loaded with compile=False
+        # because we don't care about the original optimizer / loss.
+        return load_model(model_path, compile=False)
+
     return load_model(model_path)
 
 
@@ -650,3 +668,4 @@ else:
     st.caption(
         "Upload at least one image and click **Run detection** to see predictions."
     )
+
