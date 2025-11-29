@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from PIL import Image
 from tensorflow.keras.models import load_model
+from tensorflow.keras.applications import EfficientNetB0 
 
 # For EfficientNet Kaggle model
 try:
@@ -668,4 +669,5 @@ else:
     st.caption(
         "Upload at least one image and click **Run detection** to see predictions."
     )
+
 
