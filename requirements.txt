@@ -7,5 +7,6 @@ tensorflow
 scikit-learn
 matplotlib
 seaborn
-efficientnet==1.1.1   
-h5py
+torch
+torchvision
+efficientnet_pytorch
