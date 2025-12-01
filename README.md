@@ -19,9 +19,9 @@ To solve this, this project implements a **Spatial Rich Model (SRM) + EfficientN
 
 ## Features
 - Upload single or batch images (JPG/PNG)
-- **Primary Detection Engine:**
-  - **SRM + EfficientNet (PyTorch):** High-accuracy model using residual noise extraction and TTA.
-- **Baseline/Demo Models:**
+- Primary Detection Engine:
+  - SRM + EfficientNet (PyTorch): High-accuracy model using residual noise extraction and TTA.
+- Baseline/Demo Models:
   - Basic CNN (Keras) - *Included for UI demonstration*
   - ResNet50 (Keras) - *Included for UI demonstration*
 - Adjustable detection threshold
