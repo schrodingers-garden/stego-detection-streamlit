@@ -40,7 +40,7 @@ To solve this, this project implements a **Spatial Rich Model (SRM) + EfficientN
 ---
 
 ## Folder Structure
-```text
+
 ai-stego-app/
 ├── app.py                       # Main Streamlit application
 ├── requirements.txt             # Python dependencies
