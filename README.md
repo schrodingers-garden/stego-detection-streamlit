@@ -70,18 +70,18 @@ ai-stego-app/
 ## Installation
 
 1. Clone the repository:
-
+```text
 git clone https://github.com/schrodingers-garden/ai-stego-app.git
 cd ai-stego-app
-
+```
 2. Install dependencies:
-
+```text
 pip install -r requirements.txt
-
+```
 3. Run the application locally:
-
+```text
 streamlit run app.py
-
+```
 ---
 
 ## Usage
