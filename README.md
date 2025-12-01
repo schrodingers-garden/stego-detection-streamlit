@@ -104,7 +104,7 @@ This application can be deployed for free using Streamlit Community Cloud:
 3. Deploy using:
    app.py as the entry point
 
-Note: This application is deployed and also available for testing at: https://stego-detection-app-aumgajizq2ensgnco4ruuf.streamlit.app/
+Note: This application is deployed and available for testing at: https://stego-detection-app-aumgajizq2ensgnco4ruuf.streamlit.app/
 
 ---
 
