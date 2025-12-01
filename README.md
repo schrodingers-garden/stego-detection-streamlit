@@ -40,7 +40,7 @@ To solve this, this project implements a **Spatial Rich Model (SRM) + EfficientN
 ---
 
 ## Folder Structure
-
+```text
 ai-stego-app/
 ├── app.py                       # Main Streamlit application
 ├── requirements.txt             # Python dependencies
@@ -50,7 +50,7 @@ ai-stego-app/
 │   └── resnet50_model.keras     # Demo model
 ├── sample-images/               # Optional sample images
 └── README.md
-
+```
 ---
 
 ## Getting Started
