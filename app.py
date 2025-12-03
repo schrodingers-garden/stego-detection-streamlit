@@ -4,6 +4,13 @@ import numpy as np
 import pandas as pd
 from PIL import Image
 from tensorflow.keras.models import load_model
+from tensorflow.keras.applications import EfficientNetB0 
+
+# For EfficientNet Kaggle model
+try:
+    import efficientnet.tfkeras as efn  # registers custom EfficientNet layers
+except ImportError:
+    efn = None
 
 # =========================================================
 # App Configuration
@@ -167,11 +174,13 @@ st.markdown(
 MODEL_CONFIG = {
     "Basic CNN (Keras)": "models/basic_cnn_model.keras",
     "ResNet50 (Keras)": "models/resnet50_model.keras",
+    "EfficientNet (Kaggle)": "models/efficientnet_pretrained_model.h5",
 }
 
 MODEL_INPUT_SIZE = {
     "Basic CNN (Keras)": (256, 256),
     "ResNet50 (Keras)": (512, 512),
+    "EfficientNet (Kaggle)": (512,512),
 }
 
 ALLOWED_IMAGE_EXTENSIONS = (".jpg", ".jpeg", ".png")
@@ -189,6 +198,19 @@ def load_stego_model(model_key: str):
     exception and let the caller decide to fall back to a heuristic.
     """
     model_path = MODEL_CONFIG[model_key]
+
+    # Special handling for the Kaggle EfficientNet model
+    if "EfficientNet" in model_key:
+        if efn is None:
+            raise RuntimeError(
+                "efficientnet.tfkeras is not installed. "
+                "Make sure 'efficientnet' is in requirements.txt."
+            )
+
+        # Most Kaggle EfficientNet models can be loaded with compile=False
+        # because we don't care about the original optimizer / loss.
+        return load_model(model_path, compile=False)
+
     return load_model(model_path)
 
 
@@ -478,6 +500,8 @@ if run_detection:
                     engine_label = "Basic CNN"
                 elif "ResNet50" in model_choice:
                     engine_label = "ResNet50"
+                elif "EfficientNet" in model_choice:
+                    engine_label = "EfficientNet"
                 else:
                     # Fallback: just use whatever is in the dropdown
                     engine_label = model_choice
@@ -645,8 +669,5 @@ else:
     st.caption(
         "Upload at least one image and click **Run detection** to see predictions."
     )
-
-
-
 
 

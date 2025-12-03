@@ -7,4 +7,6 @@ tensorflow
 scikit-learn
 matplotlib
 seaborn
-efficientnet
+torch
+torchvision
+efficientnet_pytorch
