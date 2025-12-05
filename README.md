@@ -113,6 +113,18 @@ See `requirements.txt` for full dependency list.
 
 ---
 
+## ⚠️ Disclaimer & Ethical Use
+**1. Limitations of Detection:**
+This tool utilizes probabilistic Deep Learning models to estimate the likelihood of hidden steganographic content. *Perfect detection is not guaranteed.*
+* False Negatives: Sophisticated adaptive steganography or low-payload embeddings may evade detection.
+* False Positives: High-noise images (ISO grain, complex textures) may occasionally be flagged as suspicious even if clean.
+* Recommendation: This tool should be used as a *triage* mechanism to flag suspicious files for further forensic analysis, not as absolute proof of guilt or innocence.
+
+**2. Warning on Misuse:**
+This application is designed for defensive steganalysis only. It must not be used to "stress test" or improve malicious steganography tools intended to evade security controls. The authors assume no liability for the misuse of this software.
+
+---
+
 ## License
 This project is for academic, non-commercial use only.
 
