@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from PIL import Image
 
-# --- Keras Imports (For your old models) ---
+# --- Keras Imports (For the demo Keras models) ---
 from tensorflow.keras.models import load_model
 
 # --- PyTorch Imports (For the new SRM model) ---
@@ -72,7 +72,7 @@ class StegoNet(nn.Module):
         return x
 
 # =========================================================
-# Global Styles (Restored from your original app)
+# Global Styles (CSS)
 # =========================================================
 st.markdown(
     """
@@ -281,7 +281,7 @@ if st.sidebar.button("Reset session", type="secondary"):
     st.rerun()
 
 # =========================================================
-# Main Layout
+# Main Layout - Preview + Prediction
 # =========================================================
 st.markdown(
     """
@@ -420,3 +420,4 @@ if st.session_state["results"]:
         render_confusion_matrix(cm)
     elif label_dict:
         st.info("Metrics not available: Some uploaded files did not match the provided CSV labels.")
+
